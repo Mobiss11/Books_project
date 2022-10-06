@@ -89,7 +89,7 @@ def main(start_id, end_id):
     Path("./books").mkdir(parents=True, exist_ok=True)
 
     for number in range(start_id, end_id):
-        url = f"https://tululu.org/txt.php?id=1{number}"
+        url = f"https://tululu.org/txt.php?id={number}"
         response = requests.get(url)
         response.raise_for_status()
 
