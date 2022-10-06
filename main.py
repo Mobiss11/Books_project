@@ -73,7 +73,7 @@ def parse_book_page(html_content):
             'title': title_text,
             'author': author_text,
             'categories': categories_text,
-            'comments': categories_text,
+            'comments': comments_text,
             'image_url': image_url
         }
 
