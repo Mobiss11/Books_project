@@ -9,6 +9,8 @@ import requests
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
+from config import book_start_id, book_end_id
+
 
 def download_txt(url, filename, folder='books/'):
     Path(folder).mkdir(parents=True, exist_ok=True)
@@ -83,10 +85,10 @@ def parse_book_page(html_content):
         print(error)
 
 
-def main():
+def main(start_id, end_id):
     Path("./books").mkdir(parents=True, exist_ok=True)
 
-    for number in range(0, 10):
+    for number in range(start_id, end_id):
         url = f"https://tululu.org/txt.php?id=1{number}"
         response = requests.get(url)
         response.raise_for_status()
@@ -104,4 +106,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(book_start_id, book_end_id)
