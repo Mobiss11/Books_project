@@ -70,9 +70,11 @@ def main():
 
                 download_image(image_url, clean_title)
 
-                description = soup.find_all('table', class_='d_book')
-                print(description[1].get_text())
+                comments = soup.find_all('div', class_='texts')
 
+                for comment in comments:
+                    comment_text = comment.find('span', class_='black')
+                    print(comment_text.get_text())
 
             except AttributeError as error:
                 print(error)
