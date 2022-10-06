@@ -67,32 +67,17 @@ def main():
             try:
                 image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
                 image_url = urljoin('https://tululu.org', image_src)
-
-                download_image(image_url, clean_title)
-
                 comments = soup.find_all('div', class_='texts')
 
                 for comment in comments:
                     comment_text = comment.find('span', class_='black')
                     print(comment_text.get_text())
 
+                download_image(image_url, clean_title)
+                download_txt(url, clean_title)
+
             except AttributeError as error:
                 print(error)
-
-            download_txt(url, clean_title)
-
-        else:
-            path_books = os.path.join(Path.cwd(), "books")
-
-            url = f"https://tululu.org/"
-            response = requests.get(url)
-            response.raise_for_status()
-
-            filename = f'main_url{number}.txt'
-            path_book = os.path.join(path_books, filename)
-
-            with open(path_book, 'wb') as file:
-                file.write(response.content)
 
 
 if __name__ == '__main__':
