@@ -45,6 +45,44 @@ def check_for_redirect(response):
         return False
 
 
+def parse_book_page(html_content):
+    try:
+
+        soup = BeautifulSoup(html_content, 'lxml')
+
+        h1 = soup.find('h1')
+        title = h1.text.split('::')
+        title_text = unicodedata.normalize("NFKD", title[0])
+        author_text = unicodedata.normalize("NFKD", title[1])
+
+        image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
+        image_url = urljoin('https://tululu.org', image_src)
+
+        categories = soup.find('div', id='content').find('span', class_='d_book').find_all('a')
+        categories_text = []
+        for category in categories:
+            categories_text.append(category.get_text())
+
+        comments = soup.find_all('div', class_='texts')
+        comments_text = []
+        for comment in comments:
+            comment_text = comment.find('span', class_='black')
+            comments_text.append(comment_text.get_text())
+
+        book_info = {
+            'title': title_text,
+            'author': author_text,
+            'categories': categories_text,
+            'comments': categories_text,
+            'image_url': image_url
+        }
+
+        return book_info
+
+    except IndexError as error:
+        print(error)
+
+
 def main():
     Path("./books").mkdir(parents=True, exist_ok=True)
 
@@ -54,37 +92,14 @@ def main():
         response.raise_for_status()
 
         if check_for_redirect(response) is True:
+            url = f"https://tululu.org/b{number}"
+            response = requests.get(url)
+            book_info = parse_book_page(response.text)
 
             try:
-                url = f"https://tululu.org/b{number}"
-                response = requests.get(url)
-
-                soup = BeautifulSoup(response.text, 'lxml')
-
-                h1 = soup.find('h1')
-                title = h1.text.split('::')
-                clean_title = unicodedata.normalize("NFKD", title[0])
-                image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
-                image_url = urljoin('https://tululu.org', image_src)
-
-                # comments = soup.find_all('div', class_='texts')
-
-                categories = soup.find('div', id='content').find('span', class_='d_book').find_all('a')
-                categories_text = []
-                for category in categories:
-                    categories_text.append(category.get_text())
-
-                print(f'Заголовок: {clean_title}')
-                print(categories_text)
-
-                # for comment in comments:
-                #     comment_text = comment.find('span', class_='black')
-                #     print(comment_text.get_text())
-
-                download_image(image_url, clean_title)
-                download_txt(url, clean_title)
-
-            except AttributeError as error:
+                download_image(book_info['image_url'], book_info['title'])
+                download_txt(url, book_info['title'])
+            except TypeError as error:
                 print(error)
 
 
