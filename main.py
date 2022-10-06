@@ -1,8 +1,11 @@
 import os
 import unicodedata
+
 from pathlib import Path
+from urllib.parse import urljoin
 
 import requests
+
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
@@ -22,6 +25,17 @@ def download_txt(url, filename, folder='books/'):
         file.write(response.content)
 
     return file
+
+
+def download_image(url, image_name):
+    Path('images/').mkdir(parents=True, exist_ok=True)
+    path_books = os.path.join(Path.cwd(), 'images/')
+
+    response = requests.get(url)
+    response.raise_for_status()
+
+    with open(f'{path_books}{image_name.strip()}.png', 'wb') as file:
+        file.write(response.content)
 
 
 def check_for_redirect(response):
@@ -49,6 +63,17 @@ def main():
             h1 = soup.find('h1')
             title = h1.text.split('::')
             clean_title = unicodedata.normalize("NFKD", title[0])
+
+            try:
+                image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
+                image_url = urljoin('https://tululu.org', image_src)
+
+                download_image(image_url, clean_title)
+
+                print(image_url)
+
+            except AttributeError as error:
+                print(error)
 
             download_txt(url, clean_title)
 
