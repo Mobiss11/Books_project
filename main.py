@@ -55,23 +55,31 @@ def main():
 
         if check_for_redirect(response) is True:
 
-            url = f"https://tululu.org/b{number}"
-            response = requests.get(url)
-
-            soup = BeautifulSoup(response.text, 'lxml')
-
-            h1 = soup.find('h1')
-            title = h1.text.split('::')
-            clean_title = unicodedata.normalize("NFKD", title[0])
-
             try:
+                url = f"https://tululu.org/b{number}"
+                response = requests.get(url)
+
+                soup = BeautifulSoup(response.text, 'lxml')
+
+                h1 = soup.find('h1')
+                title = h1.text.split('::')
+                clean_title = unicodedata.normalize("NFKD", title[0])
                 image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
                 image_url = urljoin('https://tululu.org', image_src)
-                comments = soup.find_all('div', class_='texts')
 
-                for comment in comments:
-                    comment_text = comment.find('span', class_='black')
-                    print(comment_text.get_text())
+                # comments = soup.find_all('div', class_='texts')
+
+                categories = soup.find('div', id='content').find('span', class_='d_book').find_all('a')
+                categories_text = []
+                for category in categories:
+                    categories_text.append(category.get_text())
+
+                print(f'Заголовок: {clean_title}')
+                print(categories_text)
+
+                # for comment in comments:
+                #     comment_text = comment.find('span', class_='black')
+                #     print(comment_text.get_text())
 
                 download_image(image_url, clean_title)
                 download_txt(url, clean_title)
