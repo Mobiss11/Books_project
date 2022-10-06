@@ -70,7 +70,9 @@ def main():
 
                 download_image(image_url, clean_title)
 
-                print(image_url)
+                description = soup.find_all('table', class_='d_book')
+                print(description[1].get_text())
+
 
             except AttributeError as error:
                 print(error)
