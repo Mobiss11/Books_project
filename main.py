@@ -14,7 +14,7 @@ from config import book_start_id, book_end_id
 
 def download_txt(url, filename, folder='books/'):
     Path(folder).mkdir(parents=True, exist_ok=True)
-    path_books = os.path.join(Path.cwd(), folder)
+    books_path = os.path.join(Path.cwd(), folder)
 
     file = sanitize_filename(filename)
 
@@ -22,9 +22,9 @@ def download_txt(url, filename, folder='books/'):
     response.raise_for_status()
 
     if response.status_code != 301:
-        path_book = os.path.join(path_books, f'{file}.txt')
+        book_path = os.path.join(books_path, f'{file}.txt')
 
-        with open(path_book, 'wb') as file:
+        with open(book_path, 'wb') as file:
             file.write(response.content)
 
         return file
@@ -32,13 +32,13 @@ def download_txt(url, filename, folder='books/'):
 
 def download_image(url, image_name):
     Path('images/').mkdir(parents=True, exist_ok=True)
-    path_books = os.path.join(Path.cwd(), 'images/')
+    books_path = os.path.join(Path.cwd(), 'images/')
 
     response = requests.get(url)
     response.raise_for_status()
 
     if response.status_code != 301:
-        with open(f'{path_books}{image_name.strip()}.png', 'wb') as file:
+        with open(f'{books_path}{image_name.strip()}.png', 'wb') as file:
             file.write(response.content)
 
 
