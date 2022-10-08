@@ -89,8 +89,13 @@ def main(start_id, end_id):
     Path("./books").mkdir(parents=True, exist_ok=True)
 
     for number in range(start_id, end_id):
-        url = f"https://tululu.org/txt.php?id={number}"
-        response = requests.get(url)
+
+        params = {
+            'id': number,
+        }
+
+        url = "https://tululu.org/txt.php"
+        response = requests.get(url, params=params)
         response.raise_for_status()
 
         if check_for_redirect(response) is True:
