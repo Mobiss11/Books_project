@@ -71,7 +71,7 @@ def parse_book_page(html_content):
             comment_text = comment.find('span', class_='black')
             comments_text.append(comment_text.get_text())
 
-        book_info = {
+        book = {
             'title': title_text,
             'author': author_text,
             'categories': categories_text,
@@ -79,7 +79,7 @@ def parse_book_page(html_content):
             'image_url': image_url
         }
 
-        return book_info
+        return book
 
     except IndexError as error:
         print(error)
