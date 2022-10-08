@@ -50,41 +50,36 @@ def check_for_redirect(response):
 
 
 def parse_book_page(html_content):
-    try:
+    soup = BeautifulSoup(html_content, 'lxml')
 
-        soup = BeautifulSoup(html_content, 'lxml')
+    h1 = soup.find('h1')
+    title = h1.text.split('::')
+    title_text = unicodedata.normalize("NFKD", title[0])
+    author_text = unicodedata.normalize("NFKD", title[1])
 
-        h1 = soup.find('h1')
-        title = h1.text.split('::')
-        title_text = unicodedata.normalize("NFKD", title[0])
-        author_text = unicodedata.normalize("NFKD", title[1])
+    image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
+    image_url = urljoin('https://tululu.org', image_src)
 
-        image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
-        image_url = urljoin('https://tululu.org', image_src)
+    categories = soup.find('div', id='content').find('span', class_='d_book').find_all('a')
+    categories_text = []
+    for category in categories:
+        categories_text.append(category.get_text())
 
-        categories = soup.find('div', id='content').find('span', class_='d_book').find_all('a')
-        categories_text = []
-        for category in categories:
-            categories_text.append(category.get_text())
+    comments = soup.find_all('div', class_='texts')
+    comments_text = []
+    for comment in comments:
+        comment_text = comment.find('span', class_='black')
+        comments_text.append(comment_text.get_text())
 
-        comments = soup.find_all('div', class_='texts')
-        comments_text = []
-        for comment in comments:
-            comment_text = comment.find('span', class_='black')
-            comments_text.append(comment_text.get_text())
+    book = {
+        'title': title_text,
+        'author': author_text,
+        'categories': categories_text,
+        'comments': comments_text,
+        'image_url': image_url
+    }
 
-        book = {
-            'title': title_text,
-            'author': author_text,
-            'categories': categories_text,
-            'comments': comments_text,
-            'image_url': image_url
-        }
-
-        return book
-
-    except IndexError as error:
-        print(error)
+    return book
 
 
 def main(start_id, end_id):
@@ -109,7 +104,7 @@ def main(start_id, end_id):
                 try:
                     download_image(book['image_url'], book['title'])
                     download_txt(url_for_download, book['title'])
-                except TypeError as error:
+                except TypeError or IndexError as error:
                     print(error)
 
 
