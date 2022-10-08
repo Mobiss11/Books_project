@@ -53,9 +53,11 @@ def parse_book_page(html_content):
     soup = BeautifulSoup(html_content, 'lxml')
 
     h1 = soup.find('h1')
-    title = h1.text.split('::')
-    title_text = unicodedata.normalize("NFKD", title[0])
-    author_text = unicodedata.normalize("NFKD", title[1])
+    elements_title = h1.text.split('::')
+    author, title = elements_title[1], elements_title[0]
+
+    title_text = unicodedata.normalize("NFKD", title)
+    author_text = unicodedata.normalize("NFKD", author)
 
     image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
     image_url = urljoin('https://tululu.org', image_src)
@@ -97,7 +99,7 @@ def main(start_id, end_id):
 
         if check_for_redirect(response) is True:
             url_for_parce = f"https://tululu.org/b{number}"
-            response = requests.get(url_for_parce, allow_redirects=False)
+            response = requests.get(url_for_parce)
 
             if response.status_code != 301:
                 book = parse_book_page(response.text)
