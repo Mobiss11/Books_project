@@ -21,12 +21,13 @@ def download_txt(url, filename, folder='books/'):
     response = requests.get(url)
     response.raise_for_status()
 
-    path_book = os.path.join(path_books, f'{file}.txt')
+    if response.status_code != 301:
+        path_book = os.path.join(path_books, f'{file}.txt')
 
-    with open(path_book, 'wb') as file:
-        file.write(response.content)
+        with open(path_book, 'wb') as file:
+            file.write(response.content)
 
-    return file
+        return file
 
 
 def download_image(url, image_name):
@@ -36,8 +37,9 @@ def download_image(url, image_name):
     response = requests.get(url)
     response.raise_for_status()
 
-    with open(f'{path_books}{image_name.strip()}.png', 'wb') as file:
-        file.write(response.content)
+    if response.status_code != 301:
+        with open(f'{path_books}{image_name.strip()}.png', 'wb') as file:
+            file.write(response.content)
 
 
 def check_for_redirect(response):
@@ -94,20 +96,21 @@ def main(start_id, end_id):
             'id': number,
         }
 
-        url = "https://tululu.org/txt.php"
-        response = requests.get(url, params=params)
+        url_for_download = "https://tululu.org/txt.php"
+        response = requests.get(url_for_download, params=params)
         response.raise_for_status()
 
         if check_for_redirect(response) is True:
-            url = f"https://tululu.org/b{number}"
-            response = requests.get(url)
-            book_info = parse_book_page(response.text)
+            url_for_parce = f"https://tululu.org/b{number}"
+            response = requests.get(url_for_parce, allow_redirects=False)
 
-            try:
-                download_image(book_info['image_url'], book_info['title'])
-                download_txt(url, book_info['title'])
-            except TypeError as error:
-                print(error)
+            if response.status_code != 301:
+                book = parse_book_page(response.text)
+                try:
+                    download_image(book['image_url'], book['title'])
+                    download_txt(url_for_download, book['title'])
+                except TypeError as error:
+                    print(error)
 
 
 if __name__ == '__main__':
