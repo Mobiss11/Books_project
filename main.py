@@ -43,14 +43,13 @@ def download_image(url, image_name):
 
 def check_for_redirect(response):
     try:
-        print(response.status_code)
         if response.status_code == 200 and response.encoding == 'utf-8':
             return True
     except requests.exceptions.ConnectionError:
         raise requests.exceptions.ConnectionError('Connection error')
 
 
-def parse_book_page(html_content):
+def parse_book_page(html_content, number_book):
     soup = BeautifulSoup(html_content, 'lxml')
 
     h1 = soup.find('h1')
@@ -61,7 +60,7 @@ def parse_book_page(html_content):
     author_text = unicodedata.normalize("NFKD", author)
 
     image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
-    image_url = urljoin('https://tululu.org', image_src)
+    image_url = urljoin(f'https://tululu.org/b{number_book}', image_src)
 
     categories = soup.find('div', id='content').find('span', class_='d_book').find_all('a')
     categories_text = []
@@ -103,7 +102,7 @@ def main(start_id, end_id):
             response = requests.get(url_for_parce)
 
             if response.status_code != 301:
-                book = parse_book_page(response.text)
+                book = parse_book_page(response.text, number)
                 try:
                     download_image(book['image_url'], book['title'])
                     download_txt(url_for_download, book['title'])
