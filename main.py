@@ -15,13 +15,11 @@ def download_txt(url, filename, folder='books/'):
     Path(folder).mkdir(parents=True, exist_ok=True)
     books_path = os.path.join(Path.cwd(), folder)
 
-    file = sanitize_filename(filename)
-
     response = requests.get(url)
     response.raise_for_status()
 
     if response.status_code != 301:
-        book_path = os.path.join(books_path, f'{file}.txt')
+        book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
 
         with open(book_path, 'wb') as file:
             file.write(response.content)
