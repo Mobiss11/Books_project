@@ -42,10 +42,12 @@ def download_image(url, image_name):
 
 
 def check_for_redirect(response):
-    if response.encoding == 'utf-8':
-        return True
-    else:
-        return False
+    try:
+        print(response.status_code)
+        if response.status_code == 200 and response.encoding == 'utf-8':
+            return True
+    except requests.exceptions.ConnectionError:
+        raise requests.exceptions.ConnectionError('Connection error')
 
 
 def parse_book_page(html_content):
