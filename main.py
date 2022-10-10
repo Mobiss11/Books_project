@@ -37,7 +37,8 @@ def download_image(url, image_name):
     response.raise_for_status()
 
     if response.status_code != 301:
-        with open(f'{books_path}{image_name.strip()}.png', 'wb') as file:
+        image_path = os.path.join(books_path, f'{image_name.strip()}.png')
+        with open(image_path, 'wb') as file:
             file.write(response.content)
 
 
