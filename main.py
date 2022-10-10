@@ -44,7 +44,7 @@ def check_for_redirect(response):
     try:
         if response.status_code == 200 and response.encoding == 'utf-8':
             return True
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.HTTPError:
         raise requests.exceptions.ConnectionError('Connection error')
 
 
@@ -81,27 +81,31 @@ def parse_book_page(html_content, number_book):
 def main(start_id, end_id):
     Path("./books").mkdir(parents=True, exist_ok=True)
 
-    for number in range(start_id, end_id):
+    try:
+        for number in range(start_id, end_id):
 
-        params = {
-            'id': number,
-        }
+            params = {
+                'id': number,
+            }
 
-        url_for_download = "https://tululu.org/txt.php"
-        response = requests.get(url_for_download, params=params)
-        response.raise_for_status()
+            url_for_download = "https://tululu.org/txt.php"
+            response = requests.get(url_for_download, params=params)
+            response.raise_for_status()
 
-        if check_for_redirect(response) is True:
-            url_for_parce = f"https://tululu.org/b{number}"
-            response = requests.get(url_for_parce)
+            if check_for_redirect(response) is True:
+                url_for_parce = f"https://tululu.org/b{number}"
+                response = requests.get(url_for_parce)
 
-            if response.status_code != 301:
-                book = parse_book_page(response.text, number)
-                try:
-                    download_image(book['image_url'], book['title'])
-                    download_txt(url_for_download, book['title'])
-                except TypeError or IndexError as error:
-                    print(error)
+                if response.status_code != 301:
+                    book = parse_book_page(response.text, number)
+                    try:
+                        download_image(book['image_url'], book['title'])
+                        download_txt(url_for_download, book['title'])
+                    except TypeError or IndexError as error:
+                        print(error)
+
+    except requests.exceptions.ConnectionError as error:
+        print(error)
 
 
 if __name__ == '__main__':
