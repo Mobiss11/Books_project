@@ -8,8 +8,7 @@ import requests
 
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
-
-from config import book_start_id, book_end_id
+from dotenv import load_dotenv
 
 
 def download_txt(url, filename, folder='books/'):
@@ -111,4 +110,5 @@ def main(start_id, end_id):
 
 
 if __name__ == '__main__':
-    main(book_start_id, book_end_id)
+    load_dotenv()
+    main(int(os.environ['BOOK_ID_START']), int(os.environ['BOOK_ID_END']))
