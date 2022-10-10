@@ -78,11 +78,13 @@ def parse_book_page(html_content, number_book):
     return book
 
 
-def main(start_id, end_id):
+if __name__ == '__main__':
+    load_dotenv()
+
     Path("./books").mkdir(parents=True, exist_ok=True)
 
     try:
-        for number in range(start_id, end_id):
+        for number in range(int(os.environ['BOOK_ID_START']), int(os.environ['BOOK_ID_END'])):
 
             params = {
                 'id': number,
@@ -106,8 +108,3 @@ def main(start_id, end_id):
 
     except requests.exceptions.ConnectionError as error:
         print(error)
-
-
-if __name__ == '__main__':
-    load_dotenv()
-    main(int(os.environ['BOOK_ID_START']), int(os.environ['BOOK_ID_END']))
