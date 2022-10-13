@@ -41,7 +41,7 @@ def download_image(url, image_name):
 
 
 def check_for_redirect(response):
-    if len(response.history) != 0:
+    if response.history is None:
         print('Connection error')
     else:
         return True
@@ -52,7 +52,7 @@ def parse_book_page(html_content, number_book):
 
     h1 = soup.find('h1')
     elements_title = h1.text.split('::')
-    author, title = elements_title[1], elements_title[0]
+    author, title = elements_title
 
     title_text = unicodedata.normalize("NFKD", title)
     author_text = unicodedata.normalize("NFKD", author)
