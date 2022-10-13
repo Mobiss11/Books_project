@@ -41,11 +41,8 @@ def download_image(url, image_name):
 
 
 def check_for_redirect(response):
-    try:
-        if response.status_code == 200 and response.encoding == 'utf-8':
-            return True
-    except requests.exceptions.HTTPError:
-        raise requests.exceptions.ConnectionError('Connection error')
+    if len(response.history) != 0:
+        print('Connection error')
 
 
 def parse_book_page(html_content, number_book):
@@ -94,7 +91,7 @@ if __name__ == '__main__':
             response = requests.get(url_for_download, params=params)
             response.raise_for_status()
 
-            if check_for_redirect(response) is True:
+            if check_for_redirect(response) is True and response.encoding == 'utf-8':
                 url_for_parce = f"https://tululu.org/b{number}"
                 response = requests.get(url_for_parce)
 
