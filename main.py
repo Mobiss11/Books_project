@@ -24,8 +24,6 @@ def download_txt(url, filename, folder='books/'):
         with open(book_path, 'wb') as file:
             file.write(response.content)
 
-        return file
-
 
 def download_image(url, image_name):
     Path('images/').mkdir(parents=True, exist_ok=True)
