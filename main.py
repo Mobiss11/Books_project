@@ -18,7 +18,7 @@ def download_txt(url, filename, folder='books/'):
     response = requests.get(url)
     response.raise_for_status()
 
-    if response.status_code != 301:
+    if check_for_redirect(response) is True:
         book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
 
         with open(book_path, 'wb') as file:
@@ -34,7 +34,7 @@ def download_image(url, image_name):
     response = requests.get(url)
     response.raise_for_status()
 
-    if response.status_code != 301:
+    if check_for_redirect(response) is True:
         image_path = os.path.join(books_path, f'{image_name.strip()}.png')
         with open(image_path, 'wb') as file:
             file.write(response.content)
@@ -43,6 +43,8 @@ def download_image(url, image_name):
 def check_for_redirect(response):
     if len(response.history) != 0:
         print('Connection error')
+    else:
+        return True
 
 
 def parse_book_page(html_content, number_book):
@@ -95,7 +97,7 @@ if __name__ == '__main__':
                 url_for_parce = f"https://tululu.org/b{number}"
                 response = requests.get(url_for_parce)
 
-                if response.status_code != 301:
+                if check_for_redirect(response) is True:
                     book = parse_book_page(response.text, number)
                     try:
                         download_image(book['image_url'], book['title'])
