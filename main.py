@@ -1,5 +1,6 @@
 import os
 import unicodedata
+import argparse
 
 from pathlib import Path
 from urllib.parse import urljoin
@@ -78,10 +79,17 @@ def parse_book_page(html_content, number_book):
 if __name__ == '__main__':
     load_dotenv()
 
+    parser = argparse.ArgumentParser(
+        description='Программа парсит и скачивает книги'
+    )
+    parser.add_argument('start_id', help='id первой книги', type=int)
+    parser.add_argument('end_id', help='id последней книги', type=int)
+    args = parser.parse_args()
+
     Path("./books").mkdir(parents=True, exist_ok=True)
 
     try:
-        for number in range(int(os.environ['BOOK_ID_START']), int(os.environ['BOOK_ID_END'])):
+        for number in range(args.start_id, args.end_id):
 
             params = {
                 'id': number,
