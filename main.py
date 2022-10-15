@@ -9,7 +9,6 @@ import requests
 
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
-from dotenv import load_dotenv
 
 
 def download_txt(url, filename, folder='books/'):
@@ -19,7 +18,7 @@ def download_txt(url, filename, folder='books/'):
     response = requests.get(url)
     response.raise_for_status()
 
-    if check_for_redirect(response) is True:
+    if check_for_redirect(response):
         book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
 
         with open(book_path, 'wb') as file:
@@ -33,17 +32,18 @@ def download_image(url, image_name):
     response = requests.get(url)
     response.raise_for_status()
 
-    if check_for_redirect(response) is True:
+    if check_for_redirect(response):
         image_path = os.path.join(books_path, f'{image_name.strip()}.png')
         with open(image_path, 'wb') as file:
             file.write(response.content)
 
 
 def check_for_redirect(response):
-    if response.history is None:
-        print('Connection error')
-    else:
-        return True
+    try:
+        if response.history is not None:
+            raise requests.exceptions.ConnectionError
+    except requests.exceptions.ConnectionError as error:
+        print(error)
 
 
 def parse_book_page(html_content, number_book):
@@ -77,7 +77,6 @@ def parse_book_page(html_content, number_book):
 
 
 if __name__ == '__main__':
-    load_dotenv()
 
     parser = argparse.ArgumentParser(
         description='Программа парсит и скачивает книги'
@@ -99,12 +98,13 @@ if __name__ == '__main__':
             response = requests.get(url_for_download, params=params)
             response.raise_for_status()
 
-            if check_for_redirect(response) is True and response.encoding == 'utf-8':
+            if check_for_redirect(response) and response.encoding == 'utf-8':
                 url_for_parce = f"https://tululu.org/b{number}"
                 response = requests.get(url_for_parce)
 
-                if check_for_redirect(response) is True:
+                if check_for_redirect(response):
                     book = parse_book_page(response.text, number)
+                    print(book)
 
                     download_image(book['image_url'], book['title'])
                     download_txt(url_for_download, book['title'])
