@@ -101,6 +101,7 @@ if __name__ == '__main__':
             if check_for_redirect(response) and response.encoding == 'utf-8':
                 url_for_parce = f"https://tululu.org/b{number}"
                 response = requests.get(url_for_parce)
+                response.raise_for_status()
 
                 if check_for_redirect(response):
                     book = parse_book_page(response.text, number)
