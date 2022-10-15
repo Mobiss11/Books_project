@@ -107,8 +107,11 @@ if __name__ == '__main__':
                     book = parse_book_page(response.text, number)
                     print(book)
 
-                    download_image(book['image_url'], book['title'])
-                    download_txt(url_for_download, book['title'])
+                    try:
+                        download_image(book['image_url'], book['title'])
+                        download_txt(url_for_download, book['title'])
+                    except requests.exceptions.ConnectionError as error:
+                        print(error)
 
     except requests.exceptions.ConnectionError as error:
         print(error)
