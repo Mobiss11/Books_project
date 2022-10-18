@@ -39,11 +39,8 @@ def download_image(url, image_name):
 
 
 def check_for_redirect(response):
-    try:
-        if response.history is not None:
-            raise requests.exceptions.ConnectionError
-    except requests.exceptions.ConnectionError as error:
-        print(error)
+    if response.history is not None:
+        raise requests.exceptions.ConnectionError
 
 
 def parse_book_page(html_content, number_book):
