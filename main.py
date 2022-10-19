@@ -1,4 +1,6 @@
 import os
+import time
+
 import unicodedata
 import argparse
 
@@ -106,3 +108,4 @@ if __name__ == '__main__':
 
         except requests.exceptions.ConnectionError as error:
             print(error)
+            time.sleep(10)
