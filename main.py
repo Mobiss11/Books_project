@@ -92,20 +92,18 @@ if __name__ == '__main__':
             url_for_download = "https://tululu.org/txt.php"
             response = requests.get(url_for_download, params=params)
             response.raise_for_status()
+            check_for_redirect(response)
 
-            if response.encoding == 'utf-8':
-                url_for_parce = f"https://tululu.org/b{number}"
-                response = requests.get(url_for_parce)
-                response.raise_for_status()
+            url_for_parce = f"https://tululu.org/b{number}"
+            response = requests.get(url_for_parce)
+            response.raise_for_status()
 
-                book = parse_book_page(response.text, number)
-                print(book)
+            book = parse_book_page(response.text, number)
+            print(book)
 
-                try:
-                    download_image(book['image_url'], book['title'])
-                    download_txt(url_for_download, book['title'])
-                except requests.exceptions.ConnectionError as error:
-                    print(error)
+            download_image(book['image_url'], book['title'])
+            download_txt(url_for_download, book['title'])
+
 
     except requests.exceptions.ConnectionError as error:
         print(error)
