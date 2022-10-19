@@ -17,6 +17,7 @@ def download_txt(url, filename, folder='books/'):
 
     response = requests.get(url)
     response.raise_for_status()
+    check_for_redirect(response)
 
     book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
 
