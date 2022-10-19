@@ -37,7 +37,7 @@ def download_image(url, image_name):
 
 
 def check_for_redirect(response):
-    if response.history is not None:
+    if response.history:
         raise requests.exceptions.ConnectionError
 
 
