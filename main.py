@@ -82,9 +82,8 @@ if __name__ == '__main__':
 
     Path("./books").mkdir(parents=True, exist_ok=True)
 
-    try:
-        for number in range(args.start_id, args.end_id):
-
+    for number in range(args.start_id, args.end_id):
+        try:
             params = {
                 'id': number,
             }
@@ -104,6 +103,5 @@ if __name__ == '__main__':
             download_image(book['image_url'], book['title'])
             download_txt(url_for_download, book['title'])
 
-
-    except requests.exceptions.ConnectionError as error:
-        print(error)
+        except requests.exceptions.ConnectionError as error:
+            print(error)
