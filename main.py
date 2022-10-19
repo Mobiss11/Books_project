@@ -106,6 +106,6 @@ if __name__ == '__main__':
             download_image(book['image_url'], book['title'])
             download_txt(url_for_download, book['title'])
 
-        except requests.exceptions.HTTPError as error:
+        except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
             print(error)
             time.sleep(10)
