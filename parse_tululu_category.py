@@ -108,17 +108,39 @@ def get_book_links(html_content):
 
 if __name__ == '__main__':
 
-    for page_number in range(1, 5):
-        url_for_parce = f"https://tululu.org/l55/"
-        url_page = urljoin(url_for_parce, str(page_number))
+    parser = argparse.ArgumentParser(
+        description='Программа парсит и скачивает книги'
+    )
+    parser.add_argument('--start_page', help='id первой книги', type=int)
+    parser.add_argument('--end_page', help='id последней книги', type=int, default=1)
+    args = parser.parse_args()
 
-        response = requests.get(url_page)
-        response.raise_for_status()
-        check_for_redirect(response)
+    if args.end_page == 1:
+        for page_number in range(args.start_page, 1000):
+            url_for_parce = f"https://tululu.org/l55/"
+            url_page = urljoin(url_for_parce, str(page_number))
 
-        book_links = get_book_links(response.text)
+            response = requests.get(url_page)
+            response.raise_for_status()
+            check_for_redirect(response)
 
-        books_info = parse_book_page(book_links)
+            book_links = get_book_links(response.text)
+            books_info = parse_book_page(book_links)
 
-        download_image(books_info)
-        download_txt(books_info)
+            download_image(books_info)
+            download_txt(books_info)
+
+    else:
+        for page_number in range(args.start_page, args.end_page):
+            url_for_parce = f"https://tululu.org/l55/"
+            url_page = urljoin(url_for_parce, str(page_number))
+
+            response = requests.get(url_page)
+            response.raise_for_status()
+            check_for_redirect(response)
+
+            book_links = get_book_links(response.text)
+            books_info = parse_book_page(book_links)
+
+            download_image(books_info)
+            download_txt(books_info)
