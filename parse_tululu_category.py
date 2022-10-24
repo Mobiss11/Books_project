@@ -25,15 +25,19 @@ def get_book_links(html_content):
     a_tags = [a.find('a', href=True) for a in table_tags]
     hrefs = [href['href'] for href in a_tags]
     links = [urljoin('https://tululu.org/', href) for href in hrefs]
-    print(len(links))
+    print(links)
 
     return links
 
 
 if __name__ == '__main__':
-    url_for_parce = f"https://tululu.org/fantastic/"
-    response = requests.get(url_for_parce)
-    response.raise_for_status()
-    check_for_redirect(response)
 
-    get_book_links(response.text)
+    for page_number in range(1, 5):
+        url_for_parce = f"https://tululu.org/l55/"
+        url_page = urljoin(url_for_parce, str(page_number))
+
+        response = requests.get(url_page)
+        response.raise_for_status()
+        check_for_redirect(response)
+
+        get_book_links(response.text)
