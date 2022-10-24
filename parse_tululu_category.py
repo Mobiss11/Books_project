@@ -15,7 +15,6 @@ from pathvalidate import sanitize_filename
 
 def download_txt(books_info, folder='books/'):
     for book in books_info:
-
         Path(folder).mkdir(parents=True, exist_ok=True)
         books_path = os.path.join(Path.cwd(), folder)
 
@@ -31,7 +30,6 @@ def download_txt(books_info, folder='books/'):
 
 
 def download_image(books_info):
-
     for book in books_info:
         image_name = book['title']
         image_url = book['image_url']
@@ -47,7 +45,6 @@ def download_image(books_info):
 
 
 def parse_book_page(book_links):
-
     books = []
 
     for link in book_links:
@@ -67,10 +64,10 @@ def parse_book_page(book_links):
         image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
         image_url = urljoin(f'{link}', image_src)
 
-        categories = soup.find('div', id='content').find('span', class_='d_book').find_all('a')
+        categories = soup.select('.d_book a')
         categories_text = [category.get_text() for category in categories]
 
-        comments = soup.find_all('div', class_='texts')
+        comments = soup.select('.texts')
         comments_text = [comment.find('span', class_='black').get_text() for comment in comments]
 
         book = {
@@ -95,10 +92,16 @@ def check_for_redirect(response):
 def get_book_links(html_content):
     soup = BeautifulSoup(html_content, 'lxml')
 
-    table_tags = soup.find('div', id='content').find_all('table', class_='d_book')
-    a_tags = [a.find('a', href=True) for a in table_tags]
-    hrefs = [href['href'] for href in a_tags]
-    links = [urljoin('https://tululu.org/', href) for href in hrefs]
+    tag_a = soup.select(".d_book a")
+
+    hrefs = [href.get('href') for href in tag_a]
+    books_href = []
+
+    for href in hrefs:
+        if href.find('b') != -1:
+            books_href.append(href)
+
+    links = [urljoin('https://tululu.org/', href) for href in books_href]
 
     return links
 
@@ -119,7 +122,3 @@ if __name__ == '__main__':
 
         download_image(books_info)
         download_txt(books_info)
-
-
-
-
