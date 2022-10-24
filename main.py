@@ -101,7 +101,6 @@ if __name__ == '__main__':
             response.raise_for_status()
 
             book = parse_book_page(response.text, number)
-            print(book)
 
             download_image(book['image_url'], book['title'])
             download_txt(url_for_download, book['title'])
