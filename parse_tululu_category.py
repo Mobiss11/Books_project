@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def download_txt(books_info, folder='books/'):
+def download_txt(books_info, folder):
     for book in books_info:
         Path(folder).mkdir(parents=True, exist_ok=True)
         books_path = os.path.join(Path.cwd(), folder)
@@ -29,12 +29,12 @@ def download_txt(books_info, folder='books/'):
             file.write(response.content)
 
 
-def download_image(books_info):
+def download_image(books_info, folder):
     for book in books_info:
         image_name = book['title']
         image_url = book['image_url']
         Path('images/').mkdir(parents=True, exist_ok=True)
-        books_path = os.path.join(Path.cwd(), 'images/')
+        books_path = os.path.join(Path.cwd(), folder)
 
         response = requests.get(image_url)
         response.raise_for_status()
@@ -111,10 +111,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Программа парсит и скачивает книги'
     )
-    parser.add_argument('--start_page', help='id первой книги', type=int)
-    parser.add_argument('--end_page', help='id последней книги', type=int, default=1)
+    parser.add_argument('--start_page', help='Начальная страница', type=int, default=1)
+    parser.add_argument('--end_page', help='Последняя страница', type=int, default=1)
+    parser.add_argument('--path_txt_info', help='Путь для скачивания текстовой информации', type=str, default='books/')
+    parser.add_argument('--path_images', help='Путь для скачивания фото', type=str, default='images/')
+    parser.add_argument('--skip_imgs', help='Параметр для пропуска скачивания книг', type=str, default='no skip')
+    parser.add_argument('--skip_txt', help='Параметр для пропуска скачивания текста', type=str, default='no skip')
     args = parser.parse_args()
 
+    print(args.skip_imgs)
     if args.end_page == 1:
         for page_number in range(args.start_page, 1000):
             url_for_parce = f"https://tululu.org/l55/"
@@ -127,8 +132,12 @@ if __name__ == '__main__':
             book_links = get_book_links(response.text)
             books_info = parse_book_page(book_links)
 
-            download_image(books_info)
-            download_txt(books_info)
+            if args.skip_imgs == 'no skip':
+                download_image(books_info, args.path_images)
+
+            if args.skip_txt == 'no skip':
+                download_txt(books_info, args.path_txt_info)
+
 
     else:
         for page_number in range(args.start_page, args.end_page):
@@ -142,5 +151,8 @@ if __name__ == '__main__':
             book_links = get_book_links(response.text)
             books_info = parse_book_page(book_links)
 
-            download_image(books_info)
-            download_txt(books_info)
+            if args.skip_imgs == 'no skip':
+                download_image(books_info, args.path_images)
+
+            if args.skip_txt == 'no skip':
+                download_txt(books_info, args.path_txt_info)
