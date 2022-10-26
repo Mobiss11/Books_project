@@ -119,39 +119,45 @@ if __name__ == '__main__':
     parser.add_argument('--skip_txt', help='Параметр для пропуска скачивания текста', type=str, default='no skip')
     args = parser.parse_args()
 
-    if args.end_page == 1:
-        for page_number in range(args.start_page, 1000):
-            url_for_parce = f"https://tululu.org/l55/"
-            url_page = urljoin(url_for_parce, str(page_number))
+    try:
+        if args.end_page == 1:
+            for page_number in range(args.start_page, 1000):
 
-            response = requests.get(url_page)
-            response.raise_for_status()
-            check_for_redirect(response)
+                url_for_parce = f"https://tululu.org/l55/"
+                url_page = urljoin(url_for_parce, str(page_number))
 
-            book_links = get_book_links(response.text)
-            books = parse_book_page(book_links)
+                response = requests.get(url_page)
+                response.raise_for_status()
+                check_for_redirect(response)
 
-            if args.skip_imgs == 'no skip':
-                download_image(books, args.path_images)
+                book_links = get_book_links(response.text)
+                books = parse_book_page(book_links)
 
-            if args.skip_txt == 'no skip':
-                download_txt(books, args.path_txt_info)
+                if args.skip_imgs == 'no skip':
+                    download_image(books, args.path_images)
+
+                if args.skip_txt == 'no skip':
+                    download_txt(books, args.path_txt_info)
 
 
-    else:
-        for page_number in range(args.start_page, args.end_page):
-            url_for_parce = f"https://tululu.org/l55/"
-            url_page = urljoin(url_for_parce, str(page_number))
+        else:
+            for page_number in range(args.start_page, args.end_page):
+                url_for_parce = f"https://tululu.org/l55/"
+                url_page = urljoin(url_for_parce, str(page_number))
 
-            response = requests.get(url_page)
-            response.raise_for_status()
-            check_for_redirect(response)
+                response = requests.get(url_page)
+                response.raise_for_status()
+                check_for_redirect(response)
 
-            book_links = get_book_links(response.text)
-            books = parse_book_page(book_links)
+                book_links = get_book_links(response.text)
+                books = parse_book_page(book_links)
 
-            if args.skip_imgs == 'no skip':
-                download_image(books, args.path_images)
+                if args.skip_imgs == 'no skip':
+                    download_image(books, args.path_images)
 
-            if args.skip_txt == 'no skip':
-                download_txt(books, args.path_txt_info)
+                if args.skip_txt == 'no skip':
+                    download_txt(books, args.path_txt_info)
+
+    except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
+        print(error)
+        time.sleep(10)
