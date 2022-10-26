@@ -129,13 +129,13 @@ if __name__ == '__main__':
             check_for_redirect(response)
 
             book_links = get_book_links(response.text)
-            books_info = parse_book_page(book_links)
+            books = parse_book_page(book_links)
 
             if args.skip_imgs == 'no skip':
-                download_image(books_info, args.path_images)
+                download_image(books, args.path_images)
 
             if args.skip_txt == 'no skip':
-                download_txt(books_info, args.path_txt_info)
+                download_txt(books, args.path_txt_info)
 
 
     else:
@@ -148,10 +148,10 @@ if __name__ == '__main__':
             check_for_redirect(response)
 
             book_links = get_book_links(response.text)
-            books_info = parse_book_page(book_links)
+            books = parse_book_page(book_links)
 
             if args.skip_imgs == 'no skip':
-                download_image(books_info, args.path_images)
+                download_image(books, args.path_images)
 
             if args.skip_txt == 'no skip':
-                download_txt(books_info, args.path_txt_info)
+                download_txt(books, args.path_txt_info)
