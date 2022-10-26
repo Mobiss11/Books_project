@@ -119,7 +119,6 @@ if __name__ == '__main__':
     parser.add_argument('--skip_txt', help='Параметр для пропуска скачивания текста', type=str, default='no skip')
     args = parser.parse_args()
 
-    print(args.skip_imgs)
     if args.end_page == 1:
         for page_number in range(args.start_page, 1000):
             url_for_parce = f"https://tululu.org/l55/"
