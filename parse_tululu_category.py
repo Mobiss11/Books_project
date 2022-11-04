@@ -44,44 +44,40 @@ def download_image(books_info, folder):
             file.write(response.content)
 
 
-def parse_book_page(book_links):
-    books = []
+def parse_book_page(book_link):
 
-    for link in book_links:
-        response = requests.get(link)
-        response.raise_for_status()
-        check_for_redirect(response)
+    response = requests.get(book_link)
+    response.raise_for_status()
+    check_for_redirect(response)
 
-        soup = BeautifulSoup(response.text, 'lxml')
+    soup = BeautifulSoup(response.text, 'lxml')
 
-        h1 = soup.find('h1')
-        elements_title = h1.text.split('::')
-        author, title = elements_title
+    h1 = soup.find('h1')
+    elements_title = h1.text.split('::')
+    author, title = elements_title
 
-        title_text = unicodedata.normalize("NFKD", title)
-        author_text = unicodedata.normalize("NFKD", author)
+    title_text = unicodedata.normalize("NFKD", title)
+    author_text = unicodedata.normalize("NFKD", author)
 
-        image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
-        image_url = urljoin(f'{link}', image_src)
+    image_src = soup.find('div', class_='bookimage').find('a').find('img')['src']
+    image_url = urljoin(f'{book_link}', image_src)
 
-        categories = soup.select('.d_book a')
-        categories_text = [category.get_text() for category in categories]
+    categories = soup.select('.d_book a')
+    categories_text = [category.get_text() for category in categories]
 
-        comments = soup.select('.texts')
-        comments_text = [comment.find('span', class_='black').get_text() for comment in comments]
+    comments = soup.select('.texts')
+    comments_text = [comment.find('span', class_='black').get_text() for comment in comments]
 
-        book = {
-            'title': title_text,
-            'author': author_text,
-            'categories': categories_text,
-            'comments': comments_text,
-            'image_url': image_url,
-            'book_url': link
-        }
+    book = {
+        'title': title_text,
+        'author': author_text,
+        'categories': categories_text,
+        'comments': comments_text,
+        'image_url': image_url,
+        'book_url': book_link
+    }
 
-        books.append(book)
-
-    return books
+    return book
 
 
 def check_for_redirect(response):
@@ -129,7 +125,8 @@ if __name__ == '__main__':
             check_for_redirect(response)
 
             book_links = get_book_links(response.text)
-            books = parse_book_page(book_links)
+
+            books = [parse_book_page(book) for book in book_links]
 
             if args.skip_imgs and args.skip_txt:
                 download_image(books, args.path_images)
