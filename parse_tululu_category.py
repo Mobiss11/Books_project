@@ -118,41 +118,22 @@ if __name__ == '__main__':
     parser.add_argument('--skip_imgs', help='Параметр для пропуска скачивания книг', action='store_true')
     parser.add_argument('--skip_txt', help='Параметр для пропуска скачивания текста', action='store_true')
     args = parser.parse_args()
-    print(args.skip_txt)
 
     try:
-        if args.end_page == 1:
-            for page_number in range(args.start_page, 1000):
+        for page_number in range(args.start_page, args.end_page):
+            url_for_parce = f"https://tululu.org/l55/"
+            url_page = urljoin(url_for_parce, str(page_number))
 
-                url_for_parce = f"https://tululu.org/l55/"
-                url_page = urljoin(url_for_parce, str(page_number))
+            response = requests.get(url_page)
+            response.raise_for_status()
+            check_for_redirect(response)
 
-                response = requests.get(url_page)
-                response.raise_for_status()
-                check_for_redirect(response)
+            book_links = get_book_links(response.text)
+            books = parse_book_page(book_links)
 
-                book_links = get_book_links(response.text)
-                books = parse_book_page(book_links)
-
-                if args.skip_imgs and args.skip_txt:
-                    download_image(books, args.path_images)
-                    download_txt(books, args.path_txt_info)
-
-        else:
-            for page_number in range(args.start_page, args.end_page):
-                url_for_parce = f"https://tululu.org/l55/"
-                url_page = urljoin(url_for_parce, str(page_number))
-
-                response = requests.get(url_page)
-                response.raise_for_status()
-                check_for_redirect(response)
-
-                book_links = get_book_links(response.text)
-                books = parse_book_page(book_links)
-
-                if args.skip_imgs and args.skip_txt:
-                    download_image(books, args.path_images)
-                    download_txt(books, args.path_txt_info)
+            if args.skip_imgs and args.skip_txt:
+                download_image(books, args.path_images)
+                download_txt(books, args.path_txt_info)
 
     except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
         print(error)
