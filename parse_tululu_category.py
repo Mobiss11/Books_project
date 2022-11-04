@@ -115,9 +115,10 @@ if __name__ == '__main__':
     parser.add_argument('--end_page', help='Последняя страница', type=int, default=1)
     parser.add_argument('--path_txt_info', help='Путь для скачивания текстовой информации', type=str, default='books/')
     parser.add_argument('--path_images', help='Путь для скачивания фото', type=str, default='images/')
-    parser.add_argument('--skip_imgs', help='Параметр для пропуска скачивания книг', type=str, default='no skip')
-    parser.add_argument('--skip_txt', help='Параметр для пропуска скачивания текста', type=str, default='no skip')
+    parser.add_argument('--skip_imgs', help='Параметр для пропуска скачивания книг', action='store_true')
+    parser.add_argument('--skip_txt', help='Параметр для пропуска скачивания текста', action='store_true')
     args = parser.parse_args()
+    print(args.skip_txt)
 
     try:
         if args.end_page == 1:
@@ -133,12 +134,9 @@ if __name__ == '__main__':
                 book_links = get_book_links(response.text)
                 books = parse_book_page(book_links)
 
-                if args.skip_imgs == 'no skip':
+                if args.skip_imgs and args.skip_txt:
                     download_image(books, args.path_images)
-
-                if args.skip_txt == 'no skip':
                     download_txt(books, args.path_txt_info)
-
 
         else:
             for page_number in range(args.start_page, args.end_page):
@@ -152,10 +150,8 @@ if __name__ == '__main__':
                 book_links = get_book_links(response.text)
                 books = parse_book_page(book_links)
 
-                if args.skip_imgs == 'no skip':
+                if args.skip_imgs and args.skip_txt:
                     download_image(books, args.path_images)
-
-                if args.skip_txt == 'no skip':
                     download_txt(books, args.path_txt_info)
 
     except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
