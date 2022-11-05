@@ -13,39 +13,36 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def download_txt(books_info, folder):
-    for book in books_info:
-        Path(folder).mkdir(parents=True, exist_ok=True)
-        books_path = os.path.join(Path.cwd(), folder)
+def download_txt(book_info, folder):
+    Path(folder).mkdir(parents=True, exist_ok=True)
+    books_path = os.path.join(Path.cwd(), folder)
 
-        response = requests.get(book['book_url'])
-        response.raise_for_status()
-        check_for_redirect(response)
+    response = requests.get(book_info['book_url'])
+    response.raise_for_status()
+    check_for_redirect(response)
 
-        filename = book['title']
-        book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
+    filename = book_info['title']
+    book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
 
-        with open(book_path, 'wb') as file:
-            file.write(response.content)
+    with open(book_path, 'wb') as file:
+        file.write(response.content)
 
 
-def download_image(books_info, folder):
-    for book in books_info:
-        image_name = book['title']
-        image_url = book['image_url']
-        Path('images/').mkdir(parents=True, exist_ok=True)
-        books_path = os.path.join(Path.cwd(), folder)
+def download_image(book_info, folder):
+    image_name = book_info['title']
+    image_url = book_info['image_url']
+    Path('images/').mkdir(parents=True, exist_ok=True)
+    books_path = os.path.join(Path.cwd(), folder)
 
-        response = requests.get(image_url)
-        response.raise_for_status()
+    response = requests.get(image_url)
+    response.raise_for_status()
 
-        image_path = os.path.join(books_path, f'{image_name.strip()}.png')
-        with open(image_path, 'wb') as file:
-            file.write(response.content)
+    image_path = os.path.join(books_path, f'{image_name.strip()}.png')
+    with open(image_path, 'wb') as file:
+        file.write(response.content)
 
 
 def parse_book_page(book_link):
-
     response = requests.get(book_link)
     response.raise_for_status()
     check_for_redirect(response)
@@ -115,8 +112,8 @@ if __name__ == '__main__':
     parser.add_argument('--skip_txt', help='Параметр для пропуска скачивания текста', action='store_true')
     args = parser.parse_args()
 
-    try:
-        for page_number in range(args.start_page, args.end_page):
+    for page_number in range(args.start_page, args.end_page):
+        try:
             url_for_parce = f"https://tululu.org/l55/"
             url_page = urljoin(url_for_parce, str(page_number))
 
@@ -129,9 +126,12 @@ if __name__ == '__main__':
             books = [parse_book_page(book) for book in book_links]
 
             if args.skip_imgs and args.skip_txt:
-                download_image(books, args.path_images)
-                download_txt(books, args.path_txt_info)
+                for book in books:
+                    download_image(book, args.path_images)
+                    download_txt(book, args.path_txt_info)
 
-    except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
-        print(error)
-        time.sleep(10)
+        except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
+            print(error)
+            time.sleep(10)
+
+
