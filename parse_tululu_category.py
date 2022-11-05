@@ -125,13 +125,14 @@ if __name__ == '__main__':
 
             books = [parse_book_page(book) for book in book_links]
 
-            if args.skip_imgs and args.skip_txt:
+            if args.skip_txt is not True:
+                for book in books:
+                    download_txt(book, args.path_txt_info)
+
+            if args.skip_imgs is not True:
                 for book in books:
                     download_image(book, args.path_images)
-                    download_txt(book, args.path_txt_info)
 
         except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
             print(error)
             time.sleep(10)
-
-
