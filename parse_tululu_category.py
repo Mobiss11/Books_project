@@ -42,12 +42,8 @@ def download_image(book_info, folder):
         file.write(response.content)
 
 
-def parse_book_page(book_link):
-    response = requests.get(book_link)
-    response.raise_for_status()
-    check_for_redirect(response)
-
-    soup = BeautifulSoup(response.text, 'lxml')
+def parse_book_page(book_info, book_link):
+    soup = BeautifulSoup(book_info, 'lxml')
 
     h1 = soup.find('h1')
     elements_title = h1.text.split('::')
@@ -122,8 +118,12 @@ if __name__ == '__main__':
             check_for_redirect(response)
 
             book_links = get_book_links(response.text)
-
-            books = [parse_book_page(book) for book in book_links]
+            books = []
+            for book_link in book_links:
+                response = requests.get(book_link)
+                response.raise_for_status()
+                check_for_redirect(response)
+                books.append(parse_book_page(response.text, book_link))
 
             if args.skip_txt is not True:
                 for book in books:
