@@ -125,12 +125,11 @@ if __name__ == '__main__':
                 check_for_redirect(response)
                 books.append(parse_book_page(response.text, book_link))
 
-            if args.skip_txt is not True:
-                for book in books:
+            for book in books:
+                if args.skip_txt is not True:
                     download_txt(book, args.path_txt_info)
 
-            if args.skip_imgs is not True:
-                for book in books:
+                if args.skip_imgs is not True:
                     download_image(book, args.path_images)
 
         except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
