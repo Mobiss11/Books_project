@@ -22,10 +22,10 @@ def download_txt(book, folder):
     check_for_redirect(response)
 
     filename = book['title']
-    book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
+    book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.json')
 
-    with open(book_path, 'wb') as file:
-        file.write(response.content)
+    with open(book_path, "w") as my_file:
+        my_file.write(response.content)
 
 
 def download_image(book, folder):
