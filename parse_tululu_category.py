@@ -126,11 +126,15 @@ if __name__ == '__main__':
                 books.append(parse_book_page(response.text, book_link))
 
             for book in books:
-                if not args.skip_txt:
-                    download_txt(book, args.path_txt_info)
+                try:
+                    if not args.skip_txt:
+                        download_txt(book, args.path_txt_info)
 
-                if not args.skip_imgs:
-                    download_image(book, args.path_images)
+                    if not args.skip_imgs:
+                        download_image(book, args.path_images)
+
+                except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
+                    print(error)
 
         except requests.exceptions.HTTPError and requests.exceptions.ConnectionError as error:
             print(error)
