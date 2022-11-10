@@ -13,24 +13,24 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def download_txt(book_info, folder):
+def download_txt(book, folder):
     Path(folder).mkdir(parents=True, exist_ok=True)
     books_path = os.path.join(Path.cwd(), folder)
 
-    response = requests.get(book_info['book_url'])
+    response = requests.get(book['book_url'])
     response.raise_for_status()
     check_for_redirect(response)
 
-    filename = book_info['title']
+    filename = book['title']
     book_path = os.path.join(books_path, f'{sanitize_filename(filename)}.txt')
 
     with open(book_path, 'wb') as file:
         file.write(response.content)
 
 
-def download_image(book_info, folder):
-    image_name = book_info['title']
-    image_url = book_info['image_url']
+def download_image(book, folder):
+    image_name = book['title']
+    image_url = book['image_url']
     Path('images/').mkdir(parents=True, exist_ok=True)
     books_path = os.path.join(Path.cwd(), folder)
 
@@ -42,8 +42,8 @@ def download_image(book_info, folder):
         file.write(response.content)
 
 
-def parse_book_page(book_info, book_link):
-    soup = BeautifulSoup(book_info, 'lxml')
+def parse_book_page(book, book_link):
+    soup = BeautifulSoup(book, 'lxml')
 
     h1 = soup.find('h1')
     elements_title = h1.text.split('::')
